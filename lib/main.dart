@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => NewTodoRoute()),
     );
     setState(() {
-      todoManager.addNewTodoItem(TodoItem(result));
+      if (result != null) todoManager.addNewTodoItem(TodoItem(result));
     });
   }
 }
