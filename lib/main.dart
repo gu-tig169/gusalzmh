@@ -103,29 +103,39 @@ class _MyHomePageState extends State<MyHomePage> {
                 case false:
                   customizedTitle = new Text(itemList[index].title);
               }
-              return Card(
-                child: Container(
-                  padding: new EdgeInsets.all(10),
-                  child: Column(
-                    children: <Widget>[
-                      new CheckboxListTile(
-                        controlAffinity: ListTileControlAffinity.leading,
-                        value: itemList[index].isChecked,
-                        onChanged: (bool value) {
-                          setState(() {
-                            itemList[index].isChecked = value;
-                          });
-                        },
-                        title: customizedTitle,
-                        secondary: CloseButton(onPressed: () {
-                          setState(() {
-                            TodoItem itemToRemove = itemList[index];
-                            todoManager.removeTodo(itemToRemove);
-                            itemList.remove(itemToRemove);
-                          });
-                        }),
-                      )
-                    ],
+              return Dismissible(
+                key: Key(itemList[index].title),
+                onDismissed: (DismissDirection direction) {
+                  setState(() {
+                    TodoItem itemToRemove = itemList[index];
+                    todoManager.removeTodo(itemToRemove);
+                    itemList.remove(itemToRemove);
+                  });
+                },
+                child: Card(
+                  child: Container(
+                    padding: new EdgeInsets.all(10),
+                    child: Column(
+                      children: <Widget>[
+                        new CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          value: itemList[index].isChecked,
+                          onChanged: (bool value) {
+                            setState(() {
+                              itemList[index].isChecked = value;
+                            });
+                          },
+                          title: customizedTitle,
+                          secondary: CloseButton(onPressed: () {
+                            setState(() {
+                              TodoItem itemToRemove = itemList[index];
+                              todoManager.removeTodo(itemToRemove);
+                              itemList.remove(itemToRemove);
+                            });
+                          }),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               );
