@@ -1,6 +1,7 @@
+///POCO model for one ToDo Item.
 class TodoItem {
   String title;
-  bool isChecked;
+  bool isChecked; //make it private?
 
   TodoItem(String title) {
     this.title = title;

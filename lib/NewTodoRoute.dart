@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+///Interactions for NewToDoRoute where user can add new TodoItem by entering its title.
 class NewTodoRoute extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new NewTodoRouteState();
@@ -11,7 +12,7 @@ class NewTodoRouteState extends State<NewTodoRoute> {
 
   @override
   void dispose() {
-    myController.dispose();
+    myController.dispose(); //displose controller when closing page.
     super.dispose();
   }
 
@@ -28,8 +29,9 @@ class NewTodoRouteState extends State<NewTodoRoute> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 TextField(
-                  controller: myController,
-                  autofocus: true,
+                  controller: myController, //controller to get TextField Text.
+                  autofocus:
+                      true, //get the focus to the textfield as soon as it is visible.
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(20),
                     hintText: "What are you going to do?",
@@ -39,11 +41,12 @@ class NewTodoRouteState extends State<NewTodoRoute> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
+                      //Validate text input for empty and blank.
                       myController.text.trim().isEmpty
                           ? _showSnackBar(context)
                           : Navigator.pop(
                               context,
-                              myController.text,
+                              myController.text, //pass input back to main.dart
                             );
                     });
                   },
@@ -55,6 +58,7 @@ class NewTodoRouteState extends State<NewTodoRoute> {
         }));
   }
 
+  ///Show snackbar to notify user about empty text input.
   void _showSnackBar(context) {
     SnackBar mySnackBar =
         SnackBar(content: Text("Item can't be empty, type something!"));

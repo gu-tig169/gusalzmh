@@ -1,5 +1,6 @@
 import 'package:todoApp/Modules/TodoItem.dart';
 
+///Deprecated: this class can be used to implement multiple TodoLists in the application
 class TodoList {
   String title;
   List<TodoItem> _items;

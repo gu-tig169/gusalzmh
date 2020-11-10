@@ -6,7 +6,7 @@ import 'package:todoApp/NewTodoRoute.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,9 +33,12 @@ class _MyHomePageState extends State<MyHomePage> {
   ToDoManager todoManager = ToDoManager();
   List<TodoItem> itemList;
 
+  ///Fetch all todos on first run.
   @override
   void initState() {
+    //TODO: remove the following line before deployment. It is merely for test purposes.
     todoManager.generateTestData();
+
     itemList = todoManager.getAllItems();
     super.initState();
   }
@@ -50,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onSelected: (int result) {
                 setState(() {
                   switch (result) {
+                    //get the value from popupmenu selection.
                     case 1:
                       itemList = todoManager.getAllItems();
                       break;
@@ -59,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     case 3:
                       itemList = todoManager.getUnDoneItems();
                       break;
-                    case 4:
+                    case 4: //Change to default?
                       itemList = todoManager.getAllAutoSorted();
                       break;
                   }
@@ -90,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: const EdgeInsets.all(5),
             itemCount: itemList.length,
             itemBuilder: (BuildContext context, int index) {
-              Text customizedTitle;
+              Text
+                  customizedTitle; // To customize the title according to isChecked value.
               switch (itemList[index].isChecked) {
                 case true:
                   customizedTitle = new Text(
@@ -101,15 +106,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                   break;
                 case false:
+                  //Title without customization
                   customizedTitle = new Text(itemList[index].title);
               }
               return Dismissible(
                 key: Key(itemList[index].title),
                 onDismissed: (DismissDirection direction) {
                   setState(() {
-                    TodoItem itemToRemove = itemList[index];
-                    todoManager.removeTodo(itemToRemove);
-                    itemList.remove(itemToRemove);
+                    removeItemFromList(index);
                   });
                 },
                 child: Card(
@@ -128,9 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: customizedTitle,
                           secondary: CloseButton(onPressed: () {
                             setState(() {
-                              TodoItem itemToRemove = itemList[index];
-                              todoManager.removeTodo(itemToRemove);
-                              itemList.remove(itemToRemove);
+                              removeItemFromList(index);
                             });
                           }),
                         )
@@ -154,6 +156,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  ///Removes a todoItem from listView source [itemList] and from todoManager.
+  void removeItemFromList(int index) {
+    //reference to the todoItem-to-be-removed to remove from both lists.
+    TodoItem itemToRemove = itemList[index];
+    todoManager.removeTodo(itemToRemove);
+    itemList.remove(itemToRemove);
+  }
+
+  ///Creates a new [TodoItem] and adds it to the todoManager instance if result is not null
   void _awaitReturnValueFromNewTodoRoute(context) async {
     final result = await Navigator.push(
       context,
