@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     const PopupMenuItem(
                       value: 4,
-                      child: Text('Auto'),
+                      child: Text('Undone first'),
                     )
                   ])
         ],

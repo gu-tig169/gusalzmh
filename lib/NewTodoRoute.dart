@@ -39,7 +39,7 @@ class NewTodoRouteState extends State<NewTodoRoute> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      myController.text.isEmpty
+                      myController.text.trim().isEmpty
                           ? _showSnackBar(context)
                           : Navigator.pop(
                               context,
