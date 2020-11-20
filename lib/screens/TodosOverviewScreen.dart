@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:todoApp/DataAccess/todoManager.dart';
 import 'package:todoApp/models/TodoItem.dart';
+
+import 'package:provider/provider.dart';
+import 'package:todoApp/providers/todos_provider.dart';
 
 import 'NewTodoScreen.dart';
 
@@ -15,16 +17,11 @@ class TodosOverviewScreen extends StatefulWidget {
 }
 
 class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
-  ToDoManager todoManager = ToDoManager();
-  List<TodoItem> itemList;
+  // List<TodoItem> itemList;
 
   ///Fetch all todos on first run.
   @override
   void initState() {
-    //TODO: remove the following line before deployment. It is merely for test purposes.
-    todoManager.generateTestData();
-
-    itemList = todoManager.getAllItems();
     super.initState();
   }
 
@@ -37,21 +34,21 @@ class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
           PopupMenuButton<int>(
               onSelected: (int result) {
                 setState(() {
-                  switch (result) {
-                    //get the value from popupmenu selection.
-                    case 1:
-                      itemList = todoManager.getAllItems();
-                      break;
-                    case 2:
-                      itemList = todoManager.getDoneItems();
-                      break;
-                    case 3:
-                      itemList = todoManager.getUnDoneItems();
-                      break;
-                    case 4: //Change to default?
-                      itemList = todoManager.getAllAutoSorted();
-                      break;
-                  }
+                  // switch (result) {
+                  //   //get the value from popupmenu selection.
+                  //   case 1:
+                  //     itemList = todoManager.getAllItems();
+                  //     break;
+                  //   case 2:
+                  //     itemList = todoManager.getDoneItems();
+                  //     break;
+                  //   case 3:
+                  //     itemList = todoManager.getUnDoneItems();
+                  //     break;
+                  //   case 4: //Change to default?
+                  //     itemList = todoManager.getAllAutoSorted();
+                  //     break;
+                  // }
                 });
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
@@ -75,88 +72,83 @@ class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
         ],
       ),
       body: Center(
-        child: ListView.builder(
-            padding: const EdgeInsets.all(5),
-            itemCount: itemList.length,
-            itemBuilder: (BuildContext context, int index) {
-              Text
-                  customizedTitle; // To customize the title according to isChecked value.
-              switch (itemList[index].isChecked) {
-                case true:
-                  customizedTitle = new Text(
-                    itemList[index].title,
-                    style: new TextStyle(
-                        color: Colors.black.withOpacity(0.2),
-                        decoration: TextDecoration.lineThrough),
-                  );
-                  break;
-                case false:
-                  //Title without customization
-                  customizedTitle = new Text(itemList[index].title);
-              }
-              return Dismissible(
-                key: Key(itemList[index].title),
-                onDismissed: (DismissDirection direction) {
-                  setState(() {
-                    removeItemFromList(index);
-                  });
-                },
-                child: Card(
-                  child: Container(
-                    padding: new EdgeInsets.all(10),
-                    child: Column(
-                      children: <Widget>[
-                        new CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          value: itemList[index].isChecked,
-                          onChanged: (bool value) {
-                            setState(() {
-                              itemList[index].isChecked = value;
-                            });
-                          },
-                          title: customizedTitle,
-                          secondary: CloseButton(onPressed: () {
-                            setState(() {
-                              removeItemFromList(index);
-                            });
-                          }),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
+        child: TodosListview(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // setState(() {
-          //   todoManager.addNewTodoItem(TodoItem("Test From Button"));
-          // });
-          _awaitReturnValueFromNewTodoRoute(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewTodoScreen()),
+          );
         },
         tooltip: 'Add New Task',
         child: Icon(Icons.add),
       ),
     );
   }
+}
 
-  ///Removes a todoItem from listView source [itemList] and from todoManager.
-  void removeItemFromList(int index) {
-    //reference to the todoItem-to-be-removed to remove from both lists.
-    TodoItem itemToRemove = itemList[index];
-    todoManager.removeTodo(itemToRemove);
-    itemList.remove(itemToRemove);
-  }
+class TodosListview extends StatefulWidget {
+  const TodosListview({Key key}) : super(key: key);
 
-  ///Creates a new [TodoItem] and adds it to the todoManager instance if result is not null
-  void _awaitReturnValueFromNewTodoRoute(context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => NewTodoScreen()),
-    );
-    setState(() {
-      if (result != null) todoManager.addNewTodoItem(TodoItem(result));
-    });
+  @override
+  _TodosListviewState createState() => _TodosListviewState();
+}
+
+class _TodosListviewState extends State<TodosListview> {
+  @override
+  Widget build(BuildContext context) {
+    final todosData = Provider.of<Todos>(context);
+    var itemList = todosData.allItems;
+
+    return ListView.builder(
+        padding: const EdgeInsets.all(5),
+        itemCount: itemList.length,
+        itemBuilder: (BuildContext context, int index) {
+          Text
+              customizedTitle; // To customize the title according to isChecked value.
+          switch (itemList[index].isChecked) {
+            case true:
+              customizedTitle = new Text(
+                itemList[index].title,
+                style: new TextStyle(
+                    color: Colors.black.withOpacity(0.2),
+                    decoration: TextDecoration.lineThrough),
+              );
+              break;
+            case false:
+              //Title without customization
+              customizedTitle = new Text(itemList[index].title);
+          }
+          return Dismissible(
+            key: Key(itemList[index].title),
+            onDismissed: (DismissDirection direction) {
+              todosData.removeTodo(itemList[index]);
+            },
+            child: Card(
+              child: Container(
+                padding: new EdgeInsets.all(10),
+                child: Column(
+                  children: <Widget>[
+                    new CheckboxListTile(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      value: itemList[index].isChecked,
+                      onChanged: (bool value) {
+                        todosData.changeItemStatus(itemList[index], value);
+                      },
+                      title: customizedTitle,
+                      secondary: CloseButton(onPressed: () {
+                        // todosData.removeTodo(itemList[index]);
+                        setState(() {
+                          itemList = todosData.doneItems;
+                        });
+                      }),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

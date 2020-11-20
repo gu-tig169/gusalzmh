@@ -5,9 +5,9 @@ import '../TestSeed/testData.dart';
 class Todos with ChangeNotifier {
   List<TodoItem> _items = [];
 
-  List<TodoItem> get items {
-    //wrap with spread operator to get a copy of the list. [..._items]
-    return [..._items];
+  Todos() {
+    TestData test = TestData();
+    _items.addAll(test.getFakeListOfString());
   }
 
   void addNewTodoItem(TodoItem todoItem) {
@@ -21,15 +21,16 @@ class Todos with ChangeNotifier {
   }
 
   List<TodoItem> get allItems {
-    return _items;
+    //wrap with spread operator to get a copy of the list. [..._items]
+    return [..._items];
   }
 
   List<TodoItem> get doneItems {
-    return _items.where((x) => x.isChecked).toList();
+    return [..._items].where((x) => x.isChecked).toList();
   }
 
   List<TodoItem> get unDoneItems {
-    return _items.where((x) => !x.isChecked).toList();
+    return [..._items].where((x) => !x.isChecked).toList();
   }
 
   ///Method to create a list of all items, sorted by 'Undone' first then 'done'.
@@ -39,10 +40,8 @@ class Todos with ChangeNotifier {
     return mixed;
   }
 
-  ///Method to import generated data for test purposes.
-  void generateTestData() {
-    TestData test = TestData();
-    _items.addAll(test.getFakeListOfString());
+  void changeItemStatus(TodoItem todoItem, bool value) {
+    _items[_items.indexOf(todoItem)].isChecked = value;
     notifyListeners();
   }
 }
