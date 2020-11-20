@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:todoApp/models/TodoItem.dart';
+import 'package:todoApp/util/MenuEnums.dart';
 
 import 'package:provider/provider.dart';
 import 'package:todoApp/providers/todos_provider.dart';
@@ -27,45 +27,47 @@ class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final todosData = Provider.of<Todos>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
-          PopupMenuButton<int>(
-              onSelected: (int result) {
+          PopupMenuButton<MenuFilterOptions>(
+              onSelected: (MenuFilterOptions result) {
                 setState(() {
-                  // switch (result) {
-                  //   //get the value from popupmenu selection.
-                  //   case 1:
-                  //     itemList = todoManager.getAllItems();
-                  //     break;
-                  //   case 2:
-                  //     itemList = todoManager.getDoneItems();
-                  //     break;
-                  //   case 3:
-                  //     itemList = todoManager.getUnDoneItems();
-                  //     break;
-                  //   case 4: //Change to default?
-                  //     itemList = todoManager.getAllAutoSorted();
-                  //     break;
-                  // }
+                  switch (result) {
+                    //get the value from popupmenu selection.
+                    case MenuFilterOptions.ALL:
+                      todosData.changeSearchParameter(MenuFilterOptions.ALL);
+                      break;
+                    case MenuFilterOptions.DONE:
+                      todosData.changeSearchParameter(MenuFilterOptions.DONE);
+                      break;
+                    case MenuFilterOptions.UNDONE:
+                      todosData.changeSearchParameter(MenuFilterOptions.UNDONE);
+                      break;
+                    case MenuFilterOptions.SORTED: //Change to default?
+                      todosData.changeSearchParameter(MenuFilterOptions.SORTED);
+                      break;
+                  }
                 });
               },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              itemBuilder: (BuildContext context) =>
+                  <PopupMenuEntry<MenuFilterOptions>>[
                     const PopupMenuItem(
-                      value: 1,
+                      value: MenuFilterOptions.ALL,
                       child: Text("All"),
                     ),
                     const PopupMenuItem(
-                      value: 2,
+                      value: MenuFilterOptions.DONE,
                       child: Text('Done'),
                     ),
                     const PopupMenuItem(
-                      value: 3,
+                      value: MenuFilterOptions.UNDONE,
                       child: Text('Undone'),
                     ),
                     const PopupMenuItem(
-                      value: 4,
+                      value: MenuFilterOptions.SORTED,
                       child: Text('Undone first'),
                     )
                   ])
@@ -99,7 +101,7 @@ class _TodosListviewState extends State<TodosListview> {
   @override
   Widget build(BuildContext context) {
     final todosData = Provider.of<Todos>(context);
-    var itemList = todosData.allItems;
+    var itemList = todosData.todos;
 
     return ListView.builder(
         padding: const EdgeInsets.all(5),
@@ -138,10 +140,7 @@ class _TodosListviewState extends State<TodosListview> {
                       },
                       title: customizedTitle,
                       secondary: CloseButton(onPressed: () {
-                        // todosData.removeTodo(itemList[index]);
-                        setState(() {
-                          itemList = todosData.doneItems;
-                        });
+                        todosData.removeTodo(itemList[index]);
                       }),
                     )
                   ],

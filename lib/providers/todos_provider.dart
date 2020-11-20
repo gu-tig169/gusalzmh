@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/TodoItem.dart';
 import '../TestSeed/testData.dart';
+import 'package:todoApp/util/MenuEnums.dart';
 
 class Todos with ChangeNotifier {
   List<TodoItem> _items = [];
+  MenuFilterOptions _searchParameter;
 
   Todos() {
     TestData test = TestData();
@@ -43,5 +45,30 @@ class Todos with ChangeNotifier {
   void changeItemStatus(TodoItem todoItem, bool value) {
     _items[_items.indexOf(todoItem)].isChecked = value;
     notifyListeners();
+  }
+
+  void changeSearchParameter(MenuFilterOptions searchParameter) {
+    _searchParameter = searchParameter;
+    notifyListeners();
+  }
+
+  List<TodoItem> get todos {
+    switch (_searchParameter) {
+      case MenuFilterOptions.ALL:
+        return allItems;
+        break;
+      case MenuFilterOptions.DONE:
+        return doneItems;
+        break;
+      case MenuFilterOptions.UNDONE:
+        return unDoneItems;
+        break;
+      case MenuFilterOptions.SORTED:
+        return allAutoSorted;
+        break;
+      default:
+        return allItems;
+        break;
+    }
   }
 }
