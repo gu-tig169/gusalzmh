@@ -1,4 +1,4 @@
-import 'package:todoApp/Modules/TodoItem.dart';
+import 'package:todoApp/models/TodoItem.dart';
 import 'package:todoApp/TestSeed/testData.dart';
 
 ///This class works as a holder for the todoList and has methods to CRUD items.

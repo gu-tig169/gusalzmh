@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 ///Interactions for NewToDoRoute where user can add new TodoItem by entering its title.
-class NewTodoRoute extends StatefulWidget {
+class NewTodoScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => new NewTodoRouteState();
+  State<StatefulWidget> createState() => new NewTodoScreenState();
 }
 
-class NewTodoRouteState extends State<NewTodoRoute> {
+class NewTodoScreenState extends State<NewTodoScreen> {
   final myController = TextEditingController();
 
   @override
