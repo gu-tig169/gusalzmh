@@ -51,7 +51,6 @@ class NewTodoScreenState extends State<NewTodoScreen> {
                       _showSnackBar(context);
                     } else {
                       data.addNewTodoItem(TodoItem(title: myController.text));
-                      print('new item should be added: ' + myController.text);
                       Navigator.pop(context);
                     }
                   });

@@ -17,14 +17,6 @@ class TodosOverviewScreen extends StatefulWidget {
 }
 
 class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
-  // List<TodoItem> itemList;
-
-  ///Fetch all todos on first run.
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final todosData = Provider.of<Todos>(context);
@@ -35,21 +27,7 @@ class _TodosOverviewScreenState extends State<TodosOverviewScreen> {
           PopupMenuButton<MenuFilterOptions>(
               onSelected: (MenuFilterOptions result) {
                 setState(() {
-                  switch (result) {
-                    //get the value from popupmenu selection.
-                    case MenuFilterOptions.ALL:
-                      todosData.changeSearchParameter(MenuFilterOptions.ALL);
-                      break;
-                    case MenuFilterOptions.DONE:
-                      todosData.changeSearchParameter(MenuFilterOptions.DONE);
-                      break;
-                    case MenuFilterOptions.UNDONE:
-                      todosData.changeSearchParameter(MenuFilterOptions.UNDONE);
-                      break;
-                    case MenuFilterOptions.SORTED: //Change to default?
-                      todosData.changeSearchParameter(MenuFilterOptions.SORTED);
-                      break;
-                  }
+                  todosData.changeSearchParameter(result);
                 });
               },
               itemBuilder: (BuildContext context) =>
@@ -107,25 +85,19 @@ class _TodosListviewState extends State<TodosListview> {
         padding: const EdgeInsets.all(5),
         itemCount: itemList.length,
         itemBuilder: (BuildContext context, int index) {
-          Text
-              customizedTitle; // To customize the title according to isChecked value.
-          switch (itemList[index].isChecked) {
-            case true:
-              customizedTitle = new Text(
-                itemList[index].title,
-                style: new TextStyle(
-                    color: Colors.black.withOpacity(0.2),
-                    decoration: TextDecoration.lineThrough),
-              );
-              break;
-            case false:
-              //Title without customization
-              customizedTitle = new Text(itemList[index].title);
-          }
           return Dismissible(
             key: Key(itemList[index].title),
-            onDismissed: (DismissDirection direction) {
-              todosData.removeTodo(itemList[index]);
+            background: slideRightBackground(),
+            secondaryBackground: slideLeftBackground(),
+            confirmDismiss: (DismissDirection direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                todosData.changeItemStatus(itemList[index]);
+                return false;
+              } else if (direction == DismissDirection.endToStart) {
+                todosData.removeTodo(itemList[index]);
+                return true;
+              } else
+                return false;
             },
             child: Card(
               child: Container(
@@ -136,9 +108,18 @@ class _TodosListviewState extends State<TodosListview> {
                       controlAffinity: ListTileControlAffinity.leading,
                       value: itemList[index].isChecked,
                       onChanged: (bool value) {
-                        todosData.changeItemStatus(itemList[index], value);
+                        todosData.changeItemStatus(itemList[index]);
                       },
-                      title: customizedTitle,
+                      title: Text(
+                        itemList[index].title,
+                        style: itemList[index].isChecked
+                            ? (TextStyle(
+                                color: Colors.black.withOpacity(0.2),
+                                decoration: TextDecoration.lineThrough,
+                                fontStyle: FontStyle.italic,
+                              ))
+                            : (TextStyle()),
+                      ),
                       secondary: CloseButton(onPressed: () {
                         todosData.removeTodo(itemList[index]);
                       }),
@@ -149,5 +130,31 @@ class _TodosListviewState extends State<TodosListview> {
             ),
           );
         });
+  }
+
+  slideRightBackground() {
+    return Container(
+        alignment: Alignment.centerLeft,
+        color: Colors.blue,
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+        ));
+  }
+
+  slideLeftBackground() {
+    return Container(
+        alignment: Alignment.centerRight,
+        color: Colors.red,
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ));
   }
 }

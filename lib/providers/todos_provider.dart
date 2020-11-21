@@ -42,8 +42,9 @@ class Todos with ChangeNotifier {
     return mixed;
   }
 
-  void changeItemStatus(TodoItem todoItem, bool value) {
-    _items[_items.indexOf(todoItem)].isChecked = value;
+  void changeItemStatus(TodoItem todoItem) {
+    _items[_items.indexOf(todoItem)].isChecked =
+        !_items[_items.indexOf(todoItem)].isChecked;
     notifyListeners();
   }
 
