@@ -1,6 +1,7 @@
-import 'package:todoApp/Modules/TodoItem.dart';
+import 'package:todoApp/models/TodoItem.dart';
 import 'package:todoApp/TestSeed/testData.dart';
 
+//DEPRECATED -> REPLACED WITH PROVIDER PATTERN
 ///This class works as a holder for the todoList and has methods to CRUD items.
 class ToDoManager {
   List<TodoItem> _list;
