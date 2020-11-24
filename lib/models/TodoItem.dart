@@ -1,17 +1,23 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 
 ///POCO model for one ToDo Item.
 class TodoItem {
   String title;
   bool isChecked; //make it private?
+  String id;
 
-  // TodoItem(String title) {
-  //   this.title = title;
-  //   isChecked = false;
-  // }
+  TodoItem({@required this.title, this.isChecked = false, this.id});
 
-  TodoItem({
-    @required this.title,
-    this.isChecked = false,
-  });
+  factory TodoItem.fromJson(Map<String, dynamic> json) {
+    return TodoItem(
+        title: json['title'], id: json['id'], isChecked: json['done']);
+  }
+
+  Map<String, dynamic> toJson() => {
+        "title": title,
+        "done": isChecked.toString(),
+        'id': id,
+      };
 }
