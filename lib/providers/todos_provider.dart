@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../models/TodoItem.dart';
 import 'package:todoApp/util/MenuEnums.dart';
@@ -12,8 +11,6 @@ class Todos with ChangeNotifier {
 
   List<TodoItem> _items = [];
   MenuFilterOptions _searchParameter;
-
-  Todos();
 
   List<TodoItem> get allItems {
     //wrap with spread operator to get a copy of the list. [..._items]
