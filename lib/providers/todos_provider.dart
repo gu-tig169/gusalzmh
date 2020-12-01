@@ -1,26 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/TodoItem.dart';
-import '../TestSeed/testData.dart';
 import 'package:todoApp/util/MenuEnums.dart';
+import 'package:http/http.dart' as http;
 
 class Todos with ChangeNotifier {
+  static const String serverUrl =
+      'https://todoapp-api-vldfm.ondigitalocean.app/';
+  // String key = '325eec88-d24a-404f-9d3a-db5d51b4fefe';
+  String key = 'ed773b41-ad83-47df-9514-b561f0297bde';
+
   List<TodoItem> _items = [];
   MenuFilterOptions _searchParameter;
-
-  Todos() {
-    TestData test = TestData();
-    _items.addAll(test.getFakeListOfString());
-  }
-
-  void addNewTodoItem(TodoItem todoItem) {
-    _items.add(todoItem);
-    notifyListeners();
-  }
-
-  void removeTodo(TodoItem todoItem) {
-    _items.remove(todoItem);
-    notifyListeners();
-  }
 
   List<TodoItem> get allItems {
     //wrap with spread operator to get a copy of the list. [..._items]
@@ -42,9 +33,54 @@ class Todos with ChangeNotifier {
     return mixed;
   }
 
-  void changeItemStatus(TodoItem todoItem) {
-    _items[_items.indexOf(todoItem)].isChecked =
-        !_items[_items.indexOf(todoItem)].isChecked;
+  Future<void> addNewTodoItem(TodoItem todoItem) async {
+    var response = await http.post(
+      serverUrl + 'todos?key=' + key,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'title': todoItem.title,
+        'done': todoItem.isChecked.toString(),
+      }),
+    );
+    if (response.statusCode == 200) {
+      _items = convertToTodoItemList(response);
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeTodo(TodoItem todoItem) async {
+    //DELETE /todos/:id?key=[YOUR API KEY]
+    //Try to remove it from server, if success -> remove from _items too.
+    //no need to reload the whole data.
+    String url = serverUrl + 'todos/' + todoItem.id + '?key=' + key;
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        _items.remove(todoItem);
+        notifyListeners();
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> changeItemStatus(TodoItem todoItem) async {
+    //PUT /todos/:id?key=[YOUR API KEY]
+    String url = serverUrl + 'todos/' + todoItem.id + '?key=' + key;
+    final response = await http.put(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'title': todoItem.title,
+          'done': (!todoItem.isChecked).toString(),
+        }));
+    if (response.statusCode == 200) {
+      _items.where((element) => element.id == todoItem.id).first.isChecked =
+          !todoItem.isChecked;
+    }
     notifyListeners();
   }
 
@@ -71,5 +107,26 @@ class Todos with ChangeNotifier {
         return allItems;
         break;
     }
+  }
+
+  Future<void> fetchTodos() async {
+    try {
+      final response = await http.get(serverUrl + 'todos?key=' + key);
+      _items = convertToTodoItemList(response);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static List<dynamic> convertToTodoItemList(dynamic response) {
+    final List<TodoItem> loadedList = [];
+    json.decode(response.body).forEach((data) => {
+          loadedList.add(TodoItem(
+              title: data['title'],
+              id: data['id'],
+              isChecked: data['done'] == 'true'))
+        });
+    return loadedList;
   }
 }

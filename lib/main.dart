@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => Todos(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'To-Do App',
         theme: ThemeData(
           primarySwatch: Colors.purple,
